@@ -1,2 +1,74 @@
 # leptos-wasmcloud
-Meta repo for the PoC of the integrations between wasmCloud and Leptos
+
+> This is just a meta-repo for tracking my progress trying to make
+> Leptos output the server-side binary as a WebAssembly Component
+> instead.
+
+## Overview
+
+The goal is to make [Leptos][leptos] output a
+[WebAssembly Component][wasm-component] that will serve the HTTP requests
+enabling the different
+[SSR Modes of Leptos](https://book.leptos.dev/ssr/23_ssr_modes.html).
+
+While this repository focus on the specific integration of [Leptos][leptos]
+with [wasmcloud][wasmcloud], we want to split the work in two parts:
+
+* :sparkles: **Standard WASI**: Tools that are not relying on wasmcloud features,
+  so they can be re-used in the broader WebAssembly ecosystem.
+* :rocket: **`wasmcloud`-specifics**: Tools that are specific to the integration with
+  wasmcloud.
+
+[wasm-component]: https://component-model.bytecodealliance.org/design/components.html
+
+## Architecture
+
+> This is WIP indeed.
+
+![](static/leptos-wasmcloud-v0.png)
+
+### Server Compilation
+
+The basic idea is that `cargo leptos` is responsible for calling `cargo` to
+produce:
+
+* The CSR target that will be loaded by a JS script in the browser,
+* The SSR target that we want to compile to `wasm-wasip2` component.
+
+We will write some integration code to handle the HTTP Server
+logic using [`wasi:http`][wasi-http-handler].
+
+This is already done by Leptos for different HTTP framework,
+[see here][leptos-integrations].
+
+Of course, things are not so easy!
+We need to be make sure most of the server logic can be compiled down to
+`wasm-wasip2` and implement fallback code to replace features that cannot be
+compiled.
+
+At this point, we should check if those can be compiled to our target:
+
+* Routers,
+* HTML Element Rendering,
+* Server Functions (this is dependent on the actual code written by users ofc).
+
+If we can get to there, we can already call it a big win! :tada:
+
+### wasmCloud integration
+
+Once we managed to get Leptos to output our backend as a component,
+we just have to integrate the produced artifact to the wasmCloud ecosystem.
+
+We can imagine a CLI tool that will generate a wadm manifest for our backend and
+optionally optimise it to work with `wash dev` allowing for a fast dev-loop
+when building your *full-stack* :tm: app with wasmCloud :sunglasses:
+
+[wasi-http-handler]: https://github.com/WebAssembly/wasi-http/blob/main/wit/handler.wit#L4
+[leptos-integrations]: https://github.com/leptos-rs/leptos/tree/main/integrations
+
+## Roadmap
+
+* [x] Start thinking about the overall architecture.
+* [ ] Get in touch with Leptos maintainers on their Discord to get tips.
+* [ ] Decide whether it should be in-tree Leptos code or a dedicated repo.
+* [ ] Start building (indeed)
