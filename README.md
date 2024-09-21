@@ -66,9 +66,21 @@ when building your *full-stack* :tm: app with wasmCloud :sunglasses:
 [wasi-http-handler]: https://github.com/WebAssembly/wasi-http/blob/main/wit/handler.wit#L4
 [leptos-integrations]: https://github.com/leptos-rs/leptos/tree/main/integrations
 
+### Is Nightly Rust needed?
+
+As of Rust 1.82.0, IIUC, the two unstable features we may be interested in are:
+* `wasi_ext`: Some extensions to `std::fs` and `std::net`, but seems to be only
+  *nice-to-have*.
+* the cargo feature [`build-std`](https://github.com/rust-lang/cargo/blob/rust-1.82.0/src/cargo/core/features.rs#L1253),
+  to rebuild the stdlib with optimisation of the WebAssembly target. While it's more
+  of a *nice-to-have* for the `ssr`, it's kind of important for production build
+  of the `csr` as explained in [Leptos Docs][leptos-wasm-size].
+
+[leptos-wasm-size]: https://book.leptos.dev/deployment/binary_size.html
+
 ## Roadmap
 
 * [x] Start thinking about the overall architecture.
 * [ ] Get in touch with Leptos maintainers on their Discord to get tips.
 * [ ] Decide whether it should be in-tree Leptos code or a dedicated repo.
-* [ ] Start building (indeed)
+* [x] Start building (indeed)

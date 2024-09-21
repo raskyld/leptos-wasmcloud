@@ -1,0 +1,55 @@
+[package]
+name = "leptos-wasmcloud"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+leptos = "0.6.6"
+leptos_integration_utils = { version = "0.6.6", optional = true }
+leptos_meta = "0.6.6"
+leptos_router = "0.6.6"
+wasm-bindgen = { version = "0.2", optional = true }
+wit-bindgen = { version = "0.32.0", optional = true }
+
+[features]
+hydrate = [
+  "leptos/hydrate",
+  "leptos_meta/hydrate",
+  "leptos_router/hydrate",
+  "dep:wasm-bindgen",
+]
+ssr = [
+  "leptos/ssr",
+  "leptos_meta/ssr",
+  "leptos_router/ssr",
+  "dep:wit-bindgen",
+]
+
+[profile.wasm-release]
+inherits = "release"
+opt-level = 'z'
+lto = true
+codegen-units = 1
+panic = "abort"
+
+[package.metadata.leptos]
+# == Hydrate (client)
+lib-profile-release = "wasm-release"
+lib-features = ["hydrate"]
+lib-cargo-args = [
+    "-Zbuild-std=std,panic_abort,core,alloc",
+    "-Zbuild-std-features=panic_immediate_abort,wasi_ext",
+]
+
+# == SSR
+bin-profile-release = "wasm-release"
+# TODO: port to wasip2 as soon as cargo-component supports it
+bin-target-triple = "wasm32-wasip1"
+bin-features = ["ssr"]
+bin-cargo-args = [
+    "-Zbuild-std=std,panic_abort,core,alloc",
+    "-Zbuild-std-features=panic_immediate_abort,wasi_ext",
+]

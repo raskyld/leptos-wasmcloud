@@ -1,0 +1,4 @@
+[toolchain]
+chanel = ["nightly"]
+# TODO: port to wasip2 as soon as cargo-component supports it 
+targets = [ "wasm32-unknown-unknown", "wasm32-wasip1" ]
