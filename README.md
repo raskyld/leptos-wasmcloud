@@ -52,7 +52,21 @@ At this point, we should check if those can be compiled to our target:
 * HTML Element Rendering,
 * Server Functions (this is dependent on the actual code written by users ofc).
 
+We need to hook into the [`server_fn` crate][srv_fn_crate] to add adapters
+to [`wasi:http`][wasi-http-handler].
+
 If we can get to there, we can already call it a big win! :tada:
+
+**BUT**! the user will likely want to use a custom [`world`][wit-world] to leverage
+the whole ecosystem. For example, maybe the user want to use
+the new wasmcloud's [Couchbase Integration][wasmcloud-couchbase] to do some
+NoSQL manipulation in the context of a Server Function. This means,
+the leptos `cargo` plugin needs to allow the user to customise the world
+and generate bindings accordingly.
+
+[wit-world]: https://component-model.bytecodealliance.org/design/worlds.html
+[wasmcloud-couchbase]: https://github.com/couchbaselabs/wasmcloud-provider-couchbase/tree/main/wit/couchbase
+[srv_fn_crate]: https://github.com/leptos-rs/leptos/tree/main/server_fn
 
 ### wasmCloud integration
 
