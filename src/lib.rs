@@ -14,11 +14,7 @@ cfg_if! {
         /// This is the entrypoint called by the JS "igniter" script.
         #[wasm_bindgen]
         pub fn hydrate() {
-            use routes::*;
-
-            console_error_panic_hook::set_once();
-
-            leptos::mount_to_body(AppRouter);
+            todo!()
         }
     }
 }

@@ -64,7 +64,7 @@ lib-profile-release = "wasm-release"
 lib-features = ["hydrate"]
 lib-cargo-args = [
     "-Zbuild-std=std,panic_abort,core,alloc",
-    "-Zbuild-std-features=panic_immediate_abort,wasi_ext",
+    "-Zbuild-std-features=panic_immediate_abort",
 ]
 
 # == SSR
@@ -72,6 +72,7 @@ bin-profile-release = "wasm-release"
 # TODO: port to wasip2 as soon as cargo-component supports it
 bin-target-triple = "wasm32-wasip1"
 bin-features = ["ssr"]
+bin-cargo-command = "cargo-component"
 bin-cargo-args = [
     "-Zbuild-std=std,panic_abort,core,alloc",
     "-Zbuild-std-features=panic_immediate_abort,wasi_ext",
