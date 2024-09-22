@@ -14,9 +14,12 @@ leptos_integration_utils = { version = "0.6.6", optional = true }
 leptos_meta = "0.6.6"
 leptos_router = "0.6.6"
 wasm-bindgen = { version = "0.2", optional = true }
-wit-bindgen = { version = "0.32.0", optional = true }
+wit-bindgen-rt = { version = "0.32.0", features = ["bitflags"], optional = true }
 
 [features]
+# TODO: remove the default features, cargo leptos should handle building the ssr
+#       and the hydrate itself.
+default=["ssr"]
 hydrate = [
   "leptos/hydrate",
   "leptos_meta/hydrate",
@@ -27,7 +30,7 @@ ssr = [
   "leptos/ssr",
   "leptos_meta/ssr",
   "leptos_router/ssr",
-  "dep:wit-bindgen",
+  "dep:wit-bindgen-rt",
 ]
 
 [profile.wasm-release]
@@ -36,6 +39,24 @@ opt-level = 'z'
 lto = true
 codegen-units = 1
 panic = "abort"
+
+[package.metadata.component]
+package = "examples:server"
+proxy = true
+
+[package.metadata.component.target]
+path = "wit"
+world = "examples:server/imports"
+
+[package.metadata.component.target.dependencies]
+"wasi:http" = { path = "wit/deps/http" }
+"wasi:clocks" = { path = "wit/deps/clocks" }
+"wasi:cli" = { path = "wit/deps/cli" }
+"wasi:filesystem" = { path = "wit/deps/filesystem" }
+"wasi:io" = { path = "wit/deps/io" }
+"wasi:logging" = { path = "wit/deps/logging" }
+"wasi:random" = { path = "wit/deps/random" }
+"wasi:sockets" = { path = "wit/deps/sockets" }
 
 [package.metadata.leptos]
 # == Hydrate (client)
