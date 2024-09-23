@@ -32,4 +32,14 @@ You can find details of the initial study I made [here](docs/initial-study.md).
 * [x] Get in touch with Leptos maintainers on their Discord to get tips.
 * [ ] Decide whether it should be in-tree Leptos code or a dedicated repo.
 * [x] Setup a PoC Rust project that works with `cargo leptos` and `cargo component`
-* [ ] Fixes #1
+* [x] Fixes #1 (On my fork, it's fixed, PR to upstream is open)
+* [x] Document a bit the request lifecycle
+* [ ] Provide utils in the form of a `leptos/integrations/` crate
+   * [ ] Server Functions Registry
+   * [ ] Router (Server fn, fallback to render logic)
+   * [ ] Abstract low-level Req/Res of the WASI interface
+   * [ ] Integration with Leptos Contexts
+* [ ] Propose my contribution upstream or extract the utils to a standalone crate
+* [ ] Implement an example/template app
+* [ ] Ideas of integration with wasmCloud tools
+* [ ] Share with the wasmCloud community
