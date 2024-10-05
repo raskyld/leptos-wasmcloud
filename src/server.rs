@@ -1,34 +1,91 @@
-use crate::bindings::export;
-use crate::bindings::exports::wasi::http::incoming_handler::Guest;
-use crate::bindings::wasi::http::types::*;
+use std::task::Poll;
+
+use bytes::Bytes;
+use futures::stream;
+use leptos::{config::get_configuration, error::Error, spawn::Executor};
+use leptos_wasi::{bindings::{export, exports::wasi::http::incoming_handler::Guest}, prelude::{Body, IncomingRequest, ResponseOutparam}};
+
+use crate::{bindings::wasi::filesystem::{preopens::get_directories, types::{DescriptorFlags, OpenFlags, PathFlags}}, routes::{shell, App}};
 
 struct LeptosServer;
 
+// NB(raskyld): for now, the types to use for the HTTP handlers are the one from
+// the `leptos_wasi` crate, not the one generated in your crate.
 impl Guest for LeptosServer {
     fn handle(request: IncomingRequest, response_out: ResponseOutparam) {
-        let path = request.path_with_query().unwrap_or_default();
-
-        let headers = Fields::new();
-        headers
-            .set(
-                &FieldKey::from("Content-Type"),
-                &[FieldValue::from("text/plain; charset=utf-8")],
-            )
-            .expect("setting content-type header");
-
-        let response = OutgoingResponse::new(headers);
-        let body = response.body().expect("outgoing request's body");
-
-        ResponseOutparam::set(response_out, Ok(response));
-
-        let body_stream = body.write().expect("outgoing body write stream");
-        body_stream
-            .blocking_write_and_flush(format!("You requested the path {} :D", path).as_bytes())
-            .expect("writing to body");
-
-        drop(body_stream);
-        OutgoingBody::finish(body, None).unwrap();
+        // Initiate a single-threaded [`Future`] Executor so we can run the
+        // rendering system and take advantage of bodies streaming.
+        Executor::init_futures_local_executor().expect("cannot init future executor");
+        Executor::spawn(async {
+            handle_request(request, response_out).await;
+        });
+        Executor::run();
     }
 }
 
-export!(LeptosServer with_types_in crate::bindings);
+async fn handle_request(request: IncomingRequest, response_out: ResponseOutparam) {
+    use leptos_wasi::prelude::Handler;
+    
+    let conf = get_configuration(None).unwrap();
+    let leptos_options = conf.leptos_options;
+
+    Handler::build(request, response_out)
+        .expect("could not create handler")
+        // // It's important to run `with_server_fn` functions first because they can
+        // // shortcut the whole routing and rendering process providing a fast-path
+        // // execution if the request is hitting a ServerFn.
+        // .with_server_fn()
+        .static_files_handler("/pkg", serve_static_files)
+        // Fetch all available routes from your App.
+        .generate_routes(App)
+        // Actually process the request and write the response.
+        .handle_with_context( move || shell(leptos_options.clone()), || {}).await.expect("could not handle the request");
+}
+
+fn serve_static_files(path: String)
+    -> Option<Body>
+{
+    let directories = get_directories();
+    let path = path.strip_prefix("/").unwrap_or(&path);
+    let (fd, _) = directories.first().expect("there seems to be no static files to serve");
+
+    match fd.open_at(PathFlags::empty(), &path, OpenFlags::empty(), DescriptorFlags::READ) {
+        Err(err) => {
+            println!("could not serve file {}", path);
+            println!("reason: {}", err.message());
+            return None;
+        },
+        Ok(fd) => {
+            let file_size = fd.stat().expect("should be able to stat").size;
+            match fd.read_via_stream(0) {
+                Err(err) => {
+                    println!("could not open stream to file {}", path);
+                    println!("reason: {}", err.message());
+                    return None;
+                },
+                Ok(stream) => {
+                    let mut read_bytes: u64 = 0;
+                    return Some(
+                        Body::Async(
+                            Box::pin(stream::poll_fn(move |_| -> Poll<Option<Result<Bytes, Error>>> {
+                                if read_bytes >= file_size {
+                                    return Poll::Ready(None)
+                                }
+
+                                match stream.blocking_read(256) {
+                                    Err(err) => Poll::Ready(Some(Err(err.into()))),
+                                    Ok(data) => {
+                                        read_bytes += data.len() as u64;
+                                        return Poll::Ready(Some(Ok(Bytes::from(data))));
+                                    }
+                                }
+                            }))
+                        )
+                    );
+                }
+            }
+        }
+    }
+}
+
+export!(LeptosServer with_types_in leptos_wasi::bindings);

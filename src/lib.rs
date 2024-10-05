@@ -1,3 +1,6 @@
+mod pages;
+mod routes;
+
 #[cfg(feature = "ssr")]
 mod server;
 
@@ -5,16 +8,11 @@ mod server;
 #[allow(warnings)]
 mod bindings;
 
-use cfg_if::cfg_if;
-
-cfg_if! {
-    if #[cfg(feature = "hydrate")] {
-        use wasm_bindgen::prelude::wasm_bindgen;
-
-        /// This is the entrypoint called by the JS "igniter" script.
-        #[wasm_bindgen]
-        pub fn hydrate() {
-            todo!()
-        }
-    }
+/// This is the entrypoint called by the JS "igniter" script.
+#[cfg(feature = "hydrate")]
+#[wasm_bindgen::prelude::wasm_bindgen]
+pub fn hydrate() {
+    use crate::routes::*;
+    console_error_panic_hook::set_once();
+    leptos::mount::hydrate_body(App);
 }

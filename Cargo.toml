@@ -1,5 +1,5 @@
 [package]
-name = "leptos-wasmcloud"
+name = "leptos_wasmcloud"
 version = "0.1.0"
 edition = "2021"
 
@@ -8,22 +8,21 @@ crate-type = ["cdylib"]
 
 [dependencies]
 anyhow = "1"
+bytes = "1.7.2"
 cfg-if = "1"
-leptos = "0.6.6"
-leptos_integration_utils = { version = "0.6.6", optional = true }
-leptos_meta = "0.6.6"
-leptos_router = "0.6.6"
+console_error_panic_hook = "0.1.7"
+futures = "0.3.30"
+hydration_context = "0.2.0-beta5"
+leptos = { path = "../leptos/leptos" }
+leptos_meta = { path = "../leptos/meta" }
+leptos_router = { path = "../leptos/router" }
+leptos_wasi = { path = "../leptos/integrations/wasi", optional = true }
 wasm-bindgen = { version = "0.2", optional = true }
 wit-bindgen-rt = { version = "0.32.0", features = ["bitflags"], optional = true }
 
 [features]
-# TODO: remove the default features, cargo leptos should handle building the ssr
-#       and the hydrate itself.
-default=["ssr"]
 hydrate = [
   "leptos/hydrate",
-  "leptos_meta/hydrate",
-  "leptos_router/hydrate",
   "dep:wasm-bindgen",
 ]
 ssr = [
@@ -31,6 +30,7 @@ ssr = [
   "leptos_meta/ssr",
   "leptos_router/ssr",
   "dep:wit-bindgen-rt",
+  "dep:leptos_wasi",
 ]
 
 [profile.wasm-release]
@@ -42,7 +42,6 @@ panic = "abort"
 
 [package.metadata.component]
 package = "examples:server"
-proxy = true
 
 [package.metadata.component.target]
 path = "wit"
@@ -59,6 +58,8 @@ world = "examples:server/imports"
 "wasi:sockets" = { path = "wit/deps/sockets" }
 
 [package.metadata.leptos]
+tailwind-input-file = "styles/tailwind.css"
+
 # == Hydrate (client)
 lib-profile-release = "wasm-release"
 lib-features = ["hydrate"]
@@ -73,6 +74,7 @@ bin-profile-release = "wasm-release"
 bin-target-triple = "wasm32-wasip1"
 bin-features = ["ssr"]
 bin-cargo-command = "cargo-component"
+bin-target-dir = "target/server"
 bin-cargo-args = [
     "-Zbuild-std=std,panic_abort,core,alloc",
     "-Zbuild-std-features=panic_immediate_abort,wasi_ext",
