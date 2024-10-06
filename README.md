@@ -6,11 +6,6 @@
 
 ## Overview
 
-The goal is to make [Leptos][leptos] output a
-[WebAssembly Component][wasm-component] that will serve the HTTP requests
-enabling the different
-[SSR Modes of Leptos](https://book.leptos.dev/ssr/23_ssr_modes.html).
-
 I started this repository focusing on the specific integration of [Leptos][leptos]
 with [wasmcloud][wasmcloud], but I ended up spliting my work in two phases:
 
@@ -30,16 +25,17 @@ You can find details of the initial study I made [here](docs/initial-study.md).
 
 * [x] Start thinking about the overall architecture.
 * [x] Get in touch with Leptos maintainers on their Discord to get tips.
-* [ ] Decide whether it should be in-tree Leptos code or a dedicated repo.
+* [x] Decide whether it should be in-tree Leptos code or a dedicated repo.
 * [x] Setup a PoC Rust project that works with `cargo leptos` and `cargo component`
 * [x] Fixes #1 (On my fork, it's fixed, PR to upstream is open)
 * [x] Document a bit the request lifecycle
-* [ ] Provide utils in the form of a `leptos/integrations/` crate
-   * [ ] Server Functions Registry
-   * [ ] Router (Server fn, fallback to render logic)
-   * [ ] Abstract low-level Req/Res of the WASI interface
-   * [ ] Integration with Leptos Contexts
-* [ ] Propose my contribution upstream or extract the utils to a standalone crate
+* [x] Provide utils in the form of a `leptos/integrations/` crate
+   * [x] Server Functions Registry
+   * [x] Router (Server fn, fallback to render logic)
+   * [x] Abstract low-level Req/Res of the WASI interface
+   * [x] Integration with Leptos Contexts
+* [x] Propose my contribution upstream or extract the utils to a standalone crate
+  (The PR is [there](https://github.com/leptos-rs/leptos/pull/3063))
 * [ ] Implement an example/template app
 * [ ] Ideas of integration with wasmCloud tools
 * [ ] Share with the wasmCloud community
