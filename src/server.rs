@@ -2,10 +2,10 @@ use std::task::Poll;
 
 use bytes::Bytes;
 use futures::stream;
-use leptos::{config::get_configuration, error::Error, spawn::Executor};
+use leptos::{config::get_configuration, error::Error, task::Executor};
 use leptos_wasi::{bindings::{export, exports::wasi::http::incoming_handler::Guest}, prelude::{Body, IncomingRequest, ResponseOutparam}};
 
-use crate::{bindings::wasi::filesystem::{preopens::get_directories, types::{DescriptorFlags, OpenFlags, PathFlags}}, routes::{shell, App}};
+use crate::{bindings::wasi::filesystem::{preopens::get_directories, types::{DescriptorFlags, OpenFlags, PathFlags}}, pages::home::{GetCount, UpdateCount}, routes::{shell, App}};
 
 struct LeptosServer;
 
@@ -31,11 +31,9 @@ async fn handle_request(request: IncomingRequest, response_out: ResponseOutparam
 
     Handler::build(request, response_out)
         .expect("could not create handler")
-        // // It's important to run `with_server_fn` functions first because they can
-        // // shortcut the whole routing and rendering process providing a fast-path
-        // // execution if the request is hitting a ServerFn.
-        // .with_server_fn()
         .static_files_handler("/pkg", serve_static_files)
+        .with_server_fn::<UpdateCount>()
+        .with_server_fn::<GetCount>()
         // Fetch all available routes from your App.
         .generate_routes(App)
         // Actually process the request and write the response.
