@@ -1,4 +1,3 @@
-use futures::future;
 use leptos::prelude::*;
 
 #[component]
@@ -35,10 +34,9 @@ pub fn Home() -> impl IntoView {
 
 #[server]
 pub async fn update_count() -> Result<(), ServerFnError> {
-    use crate::bindings::wasi::filesystem::{preopens::get_directories, types::{DescriptorFlags, OpenFlags, PathFlags}};
+    use wasi::filesystem::{preopens::get_directories, types::{DescriptorFlags, OpenFlags, PathFlags}};
 
     println!("User requested an update to the store");
-
     let updated_value = get_count().await? + 1;
     let directories = get_directories();
     let (fd, _) = directories.first().expect("no directory given");
@@ -57,7 +55,11 @@ pub async fn update_count() -> Result<(), ServerFnError> {
 
 #[server]
 pub async fn get_count() -> Result<u64, ServerFnError> {
-    use crate::bindings::wasi::filesystem::{preopens::get_directories, types::{DescriptorFlags, OpenFlags, PathFlags}};
+    use wasi::filesystem::{preopens::get_directories, types::{DescriptorFlags, OpenFlags, PathFlags}};
+    use leptos_wasi::executor::sleep;
+
+    println!("Sleeping 3s before getting store to test Suspense");
+    sleep(3_000_000_000).await;
 
     println!("Getting the store");
     let directories = get_directories();

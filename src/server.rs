@@ -3,9 +3,10 @@ use std::task::Poll;
 use bytes::Bytes;
 use futures::stream;
 use leptos::{config::get_configuration, error::Error, task::Executor};
-use leptos_wasi::{bindings::{export, exports::wasi::http::incoming_handler::Guest}, prelude::{Body, IncomingRequest, ResponseOutparam}};
+use leptos_wasi::prelude::{Body, WasiExecutor};
+use wasi::{exports::http::incoming_handler::Guest, filesystem::{preopens::get_directories, types::{DescriptorFlags, OpenFlags, PathFlags}}, http::{proxy::export, types::{IncomingRequest, ResponseOutparam}}};
 
-use crate::{bindings::wasi::filesystem::{preopens::get_directories, types::{DescriptorFlags, OpenFlags, PathFlags}}, pages::home::{GetCount, UpdateCount}, routes::{shell, App}};
+use crate::{pages::home::{GetCount, UpdateCount}, routes::{shell, App}};
 
 struct LeptosServer;
 
@@ -15,11 +16,11 @@ impl Guest for LeptosServer {
     fn handle(request: IncomingRequest, response_out: ResponseOutparam) {
         // Initiate a single-threaded [`Future`] Executor so we can run the
         // rendering system and take advantage of bodies streaming.
-        Executor::init_futures_local_executor().expect("cannot init future executor");
-        Executor::spawn(async {
+        let executor = WasiExecutor::new(leptos_wasi::executor::Mode::Stalled);
+        Executor::init_local_custom_executor(executor.clone()).expect("cannot init future executor");
+        executor.run_until(async {
             handle_request(request, response_out).await;
-        });
-        Executor::run();
+        })
     }
 }
 
@@ -86,4 +87,4 @@ fn serve_static_files(path: String)
     }
 }
 
-export!(LeptosServer with_types_in leptos_wasi::bindings);
+export!(LeptosServer with_types_in wasi);

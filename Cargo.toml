@@ -12,6 +12,7 @@ bytes = "1.7.2"
 cfg-if = "1"
 console_error_panic_hook = "0.1.7"
 futures = "0.3.30"
+wasi = { version = "0.13.1+wasi-0.2.0", optional = true }
 hydration_context = "0.2.0-beta5"
 leptos = { path = "../leptos/leptos" }
 leptos_meta = { path = "../leptos/meta" }
@@ -31,6 +32,7 @@ ssr = [
   "leptos_router/ssr",
   "dep:wit-bindgen-rt",
   "dep:leptos_wasi",
+  "dep:wasi",
 ]
 
 [profile.wasm-release]
