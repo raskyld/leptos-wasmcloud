@@ -44,6 +44,7 @@ async fn handle_request(request: IncomingRequest, response_out: ResponseOutparam
 fn serve_static_files(path: String)
     -> Option<Body>
 {
+    println!("serving {}", &path);
     let directories = get_directories();
     let path = path.strip_prefix("/").unwrap_or(&path);
     let (fd, _) = directories.first().expect("there seems to be no static files to serve");
