@@ -16,6 +16,9 @@ with [wasmcloud][wasmcloud], but I ended up spliting my work in two phases:
 
 You can find details of the initial study I made [here](docs/initial-study.md).
 
+Step (1) is done and has its own repository hosted on
+[`leptos-rs/leptos_wasi`](https://github.com/leptos-rs/leptos_wasi) :tada:
+
 [wasm-component]: https://component-model.bytecodealliance.org/design/components.html
 [leptos]: https://www.leptos.dev
 [wasmcloud]: https://wasmcloud.com
@@ -38,4 +41,4 @@ You can find details of the initial study I made [here](docs/initial-study.md).
   (The PR is [there](https://github.com/leptos-rs/leptos/pull/3063))
 * [ ] Implement an example/template app
 * [ ] Ideas of integration with wasmCloud tools
-* [ ] Share with the wasmCloud community
+* [x] Share with the wasmCloud community
