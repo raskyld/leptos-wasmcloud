@@ -10,8 +10,6 @@ use crate::{pages::home::{GetCount, UpdateCount}, routes::{shell, App}};
 
 struct LeptosServer;
 
-// NB(raskyld): for now, the types to use for the HTTP handlers are the one from
-// the `leptos_wasi` crate, not the one generated in your crate.
 impl Guest for LeptosServer {
     fn handle(request: IncomingRequest, response_out: ResponseOutparam) {
         // Initiate a single-threaded [`Future`] Executor so we can run the

@@ -7,19 +7,17 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-anyhow = "1"
 bytes = "1.7.2"
 cfg-if = "1"
 console_error_panic_hook = "0.1.7"
 futures = "0.3.30"
-wasi = { version = "0.13.1+wasi-0.2.0", optional = true }
-hydration_context = "0.2.0-beta5"
-leptos = { path = "../leptos/leptos" }
-leptos_meta = { path = "../leptos/meta" }
-leptos_router = { path = "../leptos/router" }
-leptos_wasi = { path = "../leptos/integrations/wasi", optional = true }
-wasm-bindgen = { version = "0.2", optional = true }
-wit-bindgen-rt = { version = "0.32.0", features = ["bitflags"], optional = true }
+wasi = { version = "0.13.1", optional = true }
+hydration_context = { git = "https://github.com/leptos-rs/leptos" }
+leptos = { git = "https://github.com/leptos-rs/leptos" }
+leptos_meta = { git = "https://github.com/leptos-rs/leptos" }
+leptos_router = { git = "https://github.com/leptos-rs/leptos" }
+leptos_wasi = { git = "https://github.com/leptos-rs/leptos_wasi", optional = true }
+wasm-bindgen = { version = "0.2.95", optional = true }
 
 [features]
 hydrate = [
@@ -30,7 +28,6 @@ ssr = [
   "leptos/ssr",
   "leptos_meta/ssr",
   "leptos_router/ssr",
-  "dep:wit-bindgen-rt",
   "dep:leptos_wasi",
   "dep:wasi",
 ]
@@ -41,23 +38,6 @@ opt-level = 'z'
 lto = true
 codegen-units = 1
 panic = "abort"
-
-[package.metadata.component]
-package = "examples:server"
-
-[package.metadata.component.target]
-path = "wit"
-world = "examples:server/imports"
-
-[package.metadata.component.target.dependencies]
-"wasi:http" = { path = "wit/deps/http" }
-"wasi:clocks" = { path = "wit/deps/clocks" }
-"wasi:cli" = { path = "wit/deps/cli" }
-"wasi:filesystem" = { path = "wit/deps/filesystem" }
-"wasi:io" = { path = "wit/deps/io" }
-"wasi:logging" = { path = "wit/deps/logging" }
-"wasi:random" = { path = "wit/deps/random" }
-"wasi:sockets" = { path = "wit/deps/sockets" }
 
 [package.metadata.leptos]
 tailwind-input-file = "styles/tailwind.css"
@@ -72,8 +52,7 @@ lib-cargo-args = [
 
 # == SSR
 bin-profile-release = "wasm-release"
-# TODO: port to wasip2 as soon as cargo-component supports it
-bin-target-triple = "wasm32-wasip1"
+bin-target-triple = "wasm32-wasip2"
 bin-features = ["ssr"]
 bin-cargo-command = "cargo-component"
 bin-target-dir = "target/server"

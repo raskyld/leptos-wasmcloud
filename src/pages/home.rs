@@ -56,10 +56,6 @@ pub async fn update_count() -> Result<(), ServerFnError> {
 #[server]
 pub async fn get_count() -> Result<u64, ServerFnError> {
     use wasi::filesystem::{preopens::get_directories, types::{DescriptorFlags, OpenFlags, PathFlags}};
-    use leptos_wasi::executor::sleep;
-
-    println!("Sleeping 3s before getting store to test Suspense");
-    sleep(3_000_000_000).await;
 
     println!("Getting the store");
     let directories = get_directories();

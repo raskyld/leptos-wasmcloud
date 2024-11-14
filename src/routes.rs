@@ -7,6 +7,7 @@ use leptos_router::{
 
 use crate::pages::home::Home;
 
+#[cfg(feature = "ssr")]
 pub fn shell(options: LeptosOptions) -> impl IntoView {
     view! {
         <!DOCTYPE html>

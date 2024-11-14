@@ -1,6 +1,0 @@
-package examples:server;
-
-world imports {
-  include wasi:http/proxy@0.2.1;
-  include wasi:filesystem/imports@0.2.1;
-}
