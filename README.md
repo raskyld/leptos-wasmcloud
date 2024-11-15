@@ -4,6 +4,10 @@
 > Leptos output the server-side binary as a WebAssembly Component
 > instead.
 
+## Demo
+
+https://www.youtube.com/watch?v=SAAyukYJGeY&t=141s
+
 ## Overview
 
 I started this repository focusing on the specific integration of [Leptos][leptos]
